@@ -1,26 +1,23 @@
 package ca.polymtl.inf4402.tp1.server;
 
-import ca.polymtl.inf4402.tp1.shared.FileInterface;
-
-public class FilePolymtl implements FileInterface{
+public class FilePoly {
 
 	private String filename;
 	private String clientId;
 	private String checksum;
 	private byte[] data;
-	
-	public FilePolymtl(String filename, String clientId, String checksum){
+
+	public FilePoly(String filename, String clientId, String checksum, byte[] data) throws java.rmi.RemoteException {
 		this.filename = filename;
 		this.clientId = clientId;
 		this.checksum = checksum;
+		this.data = data;
 	}
-	
-	@Override
+
 	public String getFilename() {
 		return filename;
 	}
 
-	@Override
 	public String getClientId() {
 		return clientId;
 	}
@@ -36,8 +33,8 @@ public class FilePolymtl implements FileInterface{
 	public void setChecksum(String checksum) {
 		this.checksum = checksum;
 	}
-	
-	public boolean isLocked(){
+
+	public boolean isLocked() {
 		return clientId != null;
 	}
 

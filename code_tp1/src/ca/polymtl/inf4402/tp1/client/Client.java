@@ -6,23 +6,23 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.HashMap;
-import java.util.Map;
+import java.security.NoSuchAlgorithmException;
 
 import ca.polymtl.inf4402.tp1.shared.ServerInterface;
 import ca.polymtl.inf4402.tp1.shared.ServerInterface.AllowedCommand;
+import ca.polymtl.inf4402.tp1.shared.Utils;
 
 public class Client {
 
 	private final String CLIENT_ID_FILENAME = "clientId.txt";
 
-	private Map<String, String> receivedFilesMap = new HashMap<String, String>();
 	private ServerInterface localServerStub = null;
 
 	public static void main(String[] args) {
@@ -47,6 +47,8 @@ public class Client {
 			client.run(command, filename);
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
+		} catch (NoSuchAlgorithmException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -60,18 +62,19 @@ public class Client {
 		localServerStub = loadServerStub("127.0.0.1");
 	}
 
-	private void run(AllowedCommand command, String filename) {
-		String checksum = receivedFilesMap.get(filename);
+	private void run(AllowedCommand command, String filename) throws NoSuchAlgorithmException {
+		String checksum = getChecksum(filename);
 		try {
 			switch (command) {
 			case CREATE:
 				System.out.println(localServerStub.create(filename));
 				break;
 			case GET:
-				get(filename, checksum);
+				get(filename);
 				System.out.println(filename + " a ete synchronise");
 				break;
 			case LIST:
+				System.out.println(localServerStub.list());
 				break;
 			case LOCK:
 				if (checksum != null) {
@@ -79,7 +82,7 @@ public class Client {
 
 					System.out.println(localServerStub.lock(filename, clientId, checksum));
 
-					get(filename, checksum);
+					get(filename);
 				} else {
 					System.out.println("Vous devez 'get' le fichier en premier !");
 				}
@@ -95,10 +98,11 @@ public class Client {
 
 	}
 
-	private void get(String filename, String checksum) throws RemoteException {
-		byte[] newData = localServerStub.get(filename, checksum);
-		if (newData != null) {
-			saveFileToLocal(filename, newData);
+	private void get(String filename) throws RemoteException, NoSuchAlgorithmException{
+		String checksum = getChecksum(filename);
+		byte[] remoteData = localServerStub.get(filename, checksum);
+		if (remoteData != null) {
+			saveFileToLocal(filename, remoteData);
 		}
 	}
 
@@ -133,10 +137,13 @@ public class Client {
 		return clientId;
 	}
 
-	private byte[] getFileDataFromLocal(String filename) {
+	private byte[] getDataFromLocal(String filename) {
 		byte[] dataEncoded = null;
 		try {
-			dataEncoded = Files.readAllBytes(Paths.get(filename));
+			Path path = Paths.get(filename);
+			if(path != null && path.toFile().exists()){
+				dataEncoded = Files.readAllBytes(path);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -160,7 +167,7 @@ public class Client {
 	private String getClientIdFromLocal() {
 		String clientId = null;
 		try {
-			byte[] data = getFileDataFromLocal(CLIENT_ID_FILENAME);
+			byte[] data = getDataFromLocal(CLIENT_ID_FILENAME);
 			clientId = new String(data, "UTF-8");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -172,5 +179,19 @@ public class Client {
 	private boolean hasClientId() {
 		File f = new File(CLIENT_ID_FILENAME);
 		return f.exists() && !f.isDirectory();
+	}
+	
+	private String getChecksum(String filename){
+		String checksum = null;
+		try {
+			byte[] data = getDataFromLocal(filename);
+			if(data != null){
+				checksum =  Utils.toMd5(data);
+			}
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		
+		return checksum;
 	}
 }

@@ -34,4 +34,6 @@ public interface ServerInterface extends Remote {
 	String lock(String filename, String clientId, String checksum) throws RemoteException;
 
 	byte[] get(String filename, String checksum) throws RemoteException;
+	
+	String list() throws RemoteException;;
 }
