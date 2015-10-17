@@ -14,6 +14,10 @@ import ca.polymtl.inf4402.tp1.shared.ServerInterface;
 
 public class Server implements ServerInterface {
 
+	// Key = Filename, Value = checksum md5
+	private Map<String, File> fileMap = new HashMap<String, File>();
+	private final byte[] EMPTY_FILE = new byte[0];
+	
 	public static void main(String[] args) {
 		Server server = new Server();
 		server.run();
@@ -44,10 +48,6 @@ public class Server implements ServerInterface {
 		}
 	}
 
-	// Key = Filename, Value = checksum md5
-	private Map<String, String> fileMap = new HashMap<String, String>();
-	private final byte[] EMPTY_FILE = new byte[0];
-
 	@Override
 	public String generateClientId() {
 		UID clientId = new UID();
@@ -60,22 +60,22 @@ public class Server implements ServerInterface {
 	}
 
 	@Override
-	public String create(String fileName) {
-		if (fileMap.containsKey(fileName)) {
-			return fileName + " existe deja";
+	public String create(String filename) {
+		if (fileMap.containsKey(filename)) {
+			return filename + " existe deja";
 		}
 		try {
-			String checksum = getMd5(EMPTY_FILE);
-			System.out.println(fileName + " : " + checksum);
-			fileMap.put(fileName, checksum);
+			String checksum = toMd5(EMPTY_FILE);
+			System.out.println(filename + " : " + checksum);
+			fileMap.put(filename, new File(filename, null, checksum));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
-			return "Erreur lors de la creation du fichier " + fileName;
+			return "Erreur lors de la creation du fichier " + filename;
 		}
-		return fileName + "a ete ajoute";
+		return filename + "a ete ajoute";
 	}
 	
-	private String getMd5(byte[] file) throws NoSuchAlgorithmException{
+	private String toMd5(byte[] file) throws NoSuchAlgorithmException{
 		byte[] digest = MessageDigest.getInstance("MD5").digest(file);
 		StringBuffer sb = new StringBuffer();
 		for (byte b : digest) {
