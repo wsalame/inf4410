@@ -63,7 +63,7 @@ public class Client {
 	}
 
 	private void run(AllowedCommand command, String filename) throws NoSuchAlgorithmException {
-		String checksum = getChecksum(filename);
+		String checksum = filename != null ? getChecksum(filename) : null;
 		try {
 			switch (command) {
 			case CREATE:
