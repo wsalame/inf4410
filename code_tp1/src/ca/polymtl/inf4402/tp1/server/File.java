@@ -24,10 +24,6 @@ public class File implements FileProxy{
 		return clientId;
 	}
 
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
-
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
 	}
@@ -38,5 +34,9 @@ public class File implements FileProxy{
 
 	public void setChecksum(String checksum) {
 		this.checksum = checksum;
+	}
+	
+	public boolean isLocked(){
+		return clientId != null;
 	}
 }

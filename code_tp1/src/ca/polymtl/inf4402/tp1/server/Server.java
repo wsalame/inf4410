@@ -3,7 +3,6 @@ package ca.polymtl.inf4402.tp1.server;
 import java.rmi.ConnectException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UID;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -17,6 +16,7 @@ public class Server implements ServerInterface {
 	// Key = Filename, Value = checksum md5
 	private Map<String, File> fileMap = new HashMap<String, File>();
 	private final byte[] EMPTY_FILE = new byte[0];
+	private static int clientId = 0;
 	
 	public static void main(String[] args) {
 		Server server = new Server();
@@ -50,13 +50,7 @@ public class Server implements ServerInterface {
 
 	@Override
 	public String generateClientId() {
-		UID clientId = new UID();
-		return clientId.toString() + getUniqueServerName();
-	}
-
-	@Override
-	public String getUniqueServerName() {
-		return "LocalRMI";
+		return "Client # " + ++clientId;
 	}
 
 	@Override
@@ -66,7 +60,6 @@ public class Server implements ServerInterface {
 		}
 		try {
 			String checksum = toMd5(EMPTY_FILE);
-			System.out.println(filename + " : " + checksum);
 			fileMap.put(filename, new File(filename, null, checksum));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();

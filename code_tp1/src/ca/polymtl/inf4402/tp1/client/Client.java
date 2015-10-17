@@ -1,15 +1,26 @@
 package ca.polymtl.inf4402.tp1.client;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.HashMap;
+import java.util.Map;
 
 import ca.polymtl.inf4402.tp1.shared.ServerInterface;
 import ca.polymtl.inf4402.tp1.shared.ServerInterface.AllowedCommand;
 
 public class Client {
+
+	private final String CLIENT_ID_FILENAME = "clientId.txt";
+
+	Map<String, String> receivedFilesMap = new HashMap<String, String>();
 
 	public static void main(String[] args) {
 		try {
@@ -48,17 +59,24 @@ public class Client {
 		localServerStub = loadServerStub("127.0.0.1");
 	}
 
-	private void run(AllowedCommand command, String fileName) {
+	private void run(AllowedCommand command, String filename) {
 		try {
 			switch (command) {
 			case CREATE:
-				System.out.println(localServerStub.create(fileName));
+				System.out.println(localServerStub.create(filename));
 				break;
 			case GET:
 				break;
 			case LIST:
 				break;
 			case LOCK:
+				String checksum = receivedFilesMap.get(filename);
+				if (checksum != null) {
+					String clientId = hasClientId() ? getClientId() : saveClientId(localServerStub.generateClientId());
+					System.out.println(localServerStub.lock(filename, clientId, checksum));
+				} else {
+					System.out.println("Vous devez 'get' le fichier en premier !");
+				}
 				break;
 			case PUSH:
 				break;
@@ -86,5 +104,35 @@ public class Client {
 		}
 
 		return stub;
+	}
+
+	private String saveClientId(String clientId) {
+		try {
+			PrintWriter out = new PrintWriter(CLIENT_ID_FILENAME);
+			out.print(clientId);
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		return clientId;
+	}
+
+	private String getClientId() {
+		String clientId = null;
+		try {
+			byte[] encoded = Files.readAllBytes(Paths.get(CLIENT_ID_FILENAME));
+			clientId = new String(encoded, "UTF-8");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return clientId;
+	}
+
+	private boolean hasClientId() {
+		File f = new File(CLIENT_ID_FILENAME);
+		return f.exists() && !f.isDirectory();
 	}
 }

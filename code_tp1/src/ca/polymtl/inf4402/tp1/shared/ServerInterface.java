@@ -27,9 +27,9 @@ public interface ServerInterface extends Remote {
 		}
 	}
 
-	String getUniqueServerName() throws RemoteException;
-
 	String generateClientId() throws RemoteException;
 
 	String create(String fileName) throws RemoteException;
+	
+	String lock(String filename,String clientId, String checksum) throws RemoteException;
 }
