@@ -72,7 +72,8 @@ public class Client {
 			case LOCK:
 				String checksum = receivedFilesMap.get(filename);
 				if (checksum != null) {
-					String clientId = hasClientId() ? getClientId() : saveClientId(localServerStub.generateClientId());
+					String clientId = hasClientId() ? getClientIdFromLocalFile() : generateClientIdAndSave(localServerStub.generateClientId());
+					
 					System.out.println(localServerStub.lock(filename, clientId, checksum));
 				} else {
 					System.out.println("Vous devez 'get' le fichier en premier !");
@@ -106,7 +107,7 @@ public class Client {
 		return stub;
 	}
 
-	private String saveClientId(String clientId) {
+	private String generateClientIdAndSave(String clientId) {
 		try {
 			PrintWriter out = new PrintWriter(CLIENT_ID_FILENAME);
 			out.print(clientId);
@@ -118,7 +119,7 @@ public class Client {
 		return clientId;
 	}
 
-	private String getClientId() {
+	private String getClientIdFromLocalFile() {
 		String clientId = null;
 		try {
 			byte[] encoded = Files.readAllBytes(Paths.get(CLIENT_ID_FILENAME));

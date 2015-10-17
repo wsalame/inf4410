@@ -2,13 +2,13 @@ package ca.polymtl.inf4402.tp1.server;
 
 import ca.polymtl.inf4402.tp1.shared.FileProxy;
 
-public class File implements FileProxy{
+public class FilePolymtl implements FileProxy{
 
 	private String filename;
 	private String clientId;
 	private String checksum;
 	
-	public File(String filename, String clientId, String checksum){
+	public FilePolymtl(String filename, String clientId, String checksum){
 		this.filename = filename;
 		this.clientId = clientId;
 		this.checksum = checksum;
