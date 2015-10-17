@@ -22,7 +22,8 @@ public class Client {
 
 	private final String CLIENT_ID_FILENAME = "clientId.txt";
 
-	Map<String, String> receivedFilesMap = new HashMap<String, String>();
+	private Map<String, String> receivedFilesMap = new HashMap<String, String>();
+	private ServerInterface localServerStub = null;
 
 	public static void main(String[] args) {
 		try {
@@ -36,20 +37,18 @@ public class Client {
 				throw new IllegalArgumentException("Veuillez rentrez une commande valide");
 			}
 
-			String fileName = null;
+			String filename = null;
 
 			if (args.length > 1) {
-				fileName = args[1];
+				filename = args[1];
 			}
 
 			Client client = new Client();
-			client.run(command, fileName);
+			client.run(command, filename);
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
 		}
 	}
-
-	private ServerInterface localServerStub = null;
 
 	public Client() {
 		super();
@@ -62,27 +61,25 @@ public class Client {
 	}
 
 	private void run(AllowedCommand command, String filename) {
+		String checksum = receivedFilesMap.get(filename);
 		try {
 			switch (command) {
 			case CREATE:
 				System.out.println(localServerStub.create(filename));
 				break;
 			case GET:
+				get(filename, checksum);
+				System.out.println(filename + " a ete synchronise");
 				break;
 			case LIST:
 				break;
 			case LOCK:
-				String checksum = receivedFilesMap.get(filename);
 				if (checksum != null) {
 					String clientId = hasClientId() ? getClientIdFromLocal() : generateClientIdAndSave(localServerStub.generateClientId());
-					
+
 					System.out.println(localServerStub.lock(filename, clientId, checksum));
-					
-					//On verifie si on a besoin de recuperer le nouveau fichier
-					byte[] newData = localServerStub.get(filename, checksum);
-					if(newData != null){
-						saveFileToLocal(filename, newData);
-					}
+
+					get(filename, checksum);
 				} else {
 					System.out.println("Vous devez 'get' le fichier en premier !");
 				}
@@ -98,12 +95,21 @@ public class Client {
 
 	}
 
+	private void get(String filename, String checksum) throws RemoteException {
+		byte[] newData = localServerStub.get(filename, checksum);
+		if (newData != null) {
+			saveFileToLocal(filename, newData);
+		}
+	}
+
 	private ServerInterface loadServerStub(String hostname) {
 		ServerInterface stub = null;
 
 		try {
 			Registry registry = LocateRegistry.getRegistry(hostname);
 			stub = (ServerInterface) registry.lookup("server");
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
 		} catch (NotBoundException e) {
 			System.out.println("Erreur: Le nom '" + e.getMessage() + "' n'est pas défini dans le registre.");
 		} catch (AccessException e) {
@@ -126,29 +132,27 @@ public class Client {
 
 		return clientId;
 	}
-	
-	private byte[] getFileDataFromLocal(String filename){
-		byte[] dataEncoded  = null;
+
+	private byte[] getFileDataFromLocal(String filename) {
+		byte[] dataEncoded = null;
 		try {
 			dataEncoded = Files.readAllBytes(Paths.get(filename));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return dataEncoded;
 	}
-	
-	private void saveFileToLocal(String filename, byte[] newData){
+
+	private void saveFileToLocal(String filename, byte[] newData) {
 		PrintWriter out;
 		try {
 			out = new PrintWriter(filename);
 			out.print(new String(newData, "UTF-8"));
 			out.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

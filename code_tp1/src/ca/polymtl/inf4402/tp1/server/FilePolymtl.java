@@ -1,8 +1,8 @@
 package ca.polymtl.inf4402.tp1.server;
 
-import ca.polymtl.inf4402.tp1.shared.FileProxy;
+import ca.polymtl.inf4402.tp1.shared.FileInterface;
 
-public class FilePolymtl implements FileProxy{
+public class FilePolymtl implements FileInterface{
 
 	private String filename;
 	private String clientId;

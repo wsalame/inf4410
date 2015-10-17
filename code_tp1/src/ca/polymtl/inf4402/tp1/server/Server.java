@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +66,7 @@ public class Server implements ServerInterface {
 			e.printStackTrace();
 			return "Erreur lors de la creation du fichier " + filename;
 		}
-		return filename + "a ete ajoute";
+		return filename + " a ete ajoute";
 	}
 	
 
@@ -87,6 +86,11 @@ public class Server implements ServerInterface {
 	@Override
 	public byte[] get(String filename, String checksum) {
 		FilePolymtl fileToRetrieve = fileMap.get(filename);
+		
+		if(fileToRetrieve == null){
+			throw new IllegalArgumentException("Le fichier " + filename + " n'existe pas.");
+		}
+		
 		if(fileToRetrieve.getChecksum().equals(checksum)){
 			return null;
 		}
