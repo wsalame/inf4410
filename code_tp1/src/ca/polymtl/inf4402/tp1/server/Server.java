@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ca.polymtl.inf4402.tp1.shared.ServerInterface;
+import ca.polymtl.inf4402.tp1.shared.Utils;
 
 public class Server implements ServerInterface {
 
@@ -60,7 +61,7 @@ public class Server implements ServerInterface {
 			return filename + " existe deja";
 		}
 		try {
-			String checksum = toMd5(EMPTY_FILE);
+			String checksum = Utils.toMd5(EMPTY_FILE);
 			fileMap.put(filename, new FilePolymtl(filename, null, checksum));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -69,14 +70,6 @@ public class Server implements ServerInterface {
 		return filename + "a ete ajoute";
 	}
 	
-	private String toMd5(byte[] file) throws NoSuchAlgorithmException{
-		byte[] digest = MessageDigest.getInstance("MD5").digest(file);
-		StringBuffer sb = new StringBuffer();
-		for (byte b : digest) {
-			sb.append(String.format("%02x", b & 0xff));
-		}
-		return sb.toString();
-	}
 
 	@Override
 	public String lock(String filename, String clientId, String checksum) throws RemoteException {
@@ -89,5 +82,15 @@ public class Server implements ServerInterface {
 		fileToRetrieve.setClientId(clientId);
 
 		return filename + " a ete verouille";
+	}
+
+	@Override
+	public byte[] get(String filename, String checksum) {
+		FilePolymtl fileToRetrieve = fileMap.get(filename);
+		if(fileToRetrieve.getChecksum().equals(checksum)){
+			return null;
+		}
+		
+		return fileToRetrieve.getData();
 	}
 }

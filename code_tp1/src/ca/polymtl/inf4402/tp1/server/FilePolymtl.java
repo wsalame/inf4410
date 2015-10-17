@@ -7,6 +7,7 @@ public class FilePolymtl implements FileProxy{
 	private String filename;
 	private String clientId;
 	private String checksum;
+	private byte[] data;
 	
 	public FilePolymtl(String filename, String clientId, String checksum){
 		this.filename = filename;
@@ -38,5 +39,13 @@ public class FilePolymtl implements FileProxy{
 	
 	public boolean isLocked(){
 		return clientId != null;
+	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 }

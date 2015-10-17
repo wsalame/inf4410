@@ -2,7 +2,9 @@ package ca.polymtl.inf4402.tp1.client;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.AccessException;
@@ -72,9 +74,15 @@ public class Client {
 			case LOCK:
 				String checksum = receivedFilesMap.get(filename);
 				if (checksum != null) {
-					String clientId = hasClientId() ? getClientIdFromLocalFile() : generateClientIdAndSave(localServerStub.generateClientId());
+					String clientId = hasClientId() ? getClientIdFromLocal() : generateClientIdAndSave(localServerStub.generateClientId());
 					
 					System.out.println(localServerStub.lock(filename, clientId, checksum));
+					
+					//On verifie si on a besoin de recuperer le nouveau fichier
+					byte[] newData = localServerStub.get(filename, checksum);
+					if(newData != null){
+						saveFileToLocal(filename, newData);
+					}
 				} else {
 					System.out.println("Vous devez 'get' le fichier en premier !");
 				}
@@ -118,14 +126,39 @@ public class Client {
 
 		return clientId;
 	}
+	
+	private byte[] getFileDataFromLocal(String filename){
+		byte[] dataEncoded  = null;
+		try {
+			dataEncoded = Files.readAllBytes(Paths.get(filename));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return dataEncoded;
+	}
+	
+	private void saveFileToLocal(String filename, byte[] newData){
+		PrintWriter out;
+		try {
+			out = new PrintWriter(filename);
+			out.print(new String(newData, "UTF-8"));
+			out.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-	private String getClientIdFromLocalFile() {
+	private String getClientIdFromLocal() {
 		String clientId = null;
 		try {
-			byte[] encoded = Files.readAllBytes(Paths.get(CLIENT_ID_FILENAME));
-			clientId = new String(encoded, "UTF-8");
+			byte[] data = getFileDataFromLocal(CLIENT_ID_FILENAME);
+			clientId = new String(data, "UTF-8");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
