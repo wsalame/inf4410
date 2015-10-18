@@ -78,7 +78,8 @@ public class Client {
 				break;
 			case LOCK:
 				if (checksum != null) {
-					String clientId = hasClientId() ? getClientIdFromLocal() : generateClientIdAndSave(localServerStub.generateClientId());
+					String clientId = hasClientId() ? getClientIdFromLocal()
+					    : generateClientIdAndSave(localServerStub.generateClientId());
 
 					System.out.println(localServerStub.lock(filename, clientId, checksum));
 
@@ -98,7 +99,7 @@ public class Client {
 
 	}
 
-	private void get(String filename) throws RemoteException, NoSuchAlgorithmException{
+	private void get(String filename) throws RemoteException, NoSuchAlgorithmException {
 		String checksum = getChecksum(filename);
 		byte[] remoteData = localServerStub.get(filename, checksum);
 		if (remoteData != null) {
@@ -115,7 +116,8 @@ public class Client {
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
 		} catch (NotBoundException e) {
-			System.out.println("Erreur: Le nom '" + e.getMessage() + "' n'est pas défini dans le registre.");
+			System.out.println("Erreur: Le nom '" + e.getMessage()
+			    + "' n'est pas défini dans le registre.");
 		} catch (AccessException e) {
 			System.out.println("Erreur: " + e.getMessage());
 		} catch (RemoteException e) {
@@ -141,7 +143,7 @@ public class Client {
 		byte[] dataEncoded = null;
 		try {
 			Path path = Paths.get(filename);
-			if(path != null && path.toFile().exists()){
+			if (path != null && path.toFile().exists()) {
 				dataEncoded = Files.readAllBytes(path);
 			}
 		} catch (IOException e) {
@@ -180,18 +182,18 @@ public class Client {
 		File f = new File(CLIENT_ID_FILENAME);
 		return f.exists() && !f.isDirectory();
 	}
-	
-	private String getChecksum(String filename){
+
+	private String getChecksum(String filename) {
 		String checksum = null;
 		try {
 			byte[] data = getDataFromLocal(filename);
-			if(data != null){
-				checksum =  Utils.toMd5(data);
+			if (data != null) {
+				checksum = Utils.toMd5(data);
 			}
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
-		
+
 		return checksum;
 	}
 }

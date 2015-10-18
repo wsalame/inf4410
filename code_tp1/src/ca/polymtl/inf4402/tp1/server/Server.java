@@ -31,8 +31,7 @@ public class Server implements ServerInterface {
 		}
 
 		try {
-			ServerInterface stub = (ServerInterface) UnicastRemoteObject
-					.exportObject(this, 0);
+			ServerInterface stub = (ServerInterface) UnicastRemoteObject.exportObject(this, 0);
 
 			Registry registry = LocateRegistry.getRegistry();
 			registry.rebind("server", stub);
@@ -40,7 +39,7 @@ public class Server implements ServerInterface {
 
 		} catch (ConnectException e) {
 			System.err
-					.println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
+			    .println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
 			System.err.println();
 			System.err.println("Erreur: " + e.getMessage());
 		} catch (Exception e) {
@@ -68,7 +67,7 @@ public class Server implements ServerInterface {
 	}
 
 	private void createInMemory(String filename, byte[] data, String clientId)
-			throws NoSuchAlgorithmException {
+	    throws NoSuchAlgorithmException {
 		String checksum = Utils.toMd5(data);
 		fileMap.put(filename, new FilePoly(filename, clientId, checksum, data));
 	}
@@ -78,14 +77,12 @@ public class Server implements ServerInterface {
 		FilePoly fileToRetrieve = fileMap.get(filename);
 
 		if (fileToRetrieve == null) {
-			throw new IllegalArgumentException("Le fichier " + filename
-					+ " n'existe pas.");
+			throw new IllegalArgumentException("Le fichier " + filename + " n'existe pas.");
 		}
 
 		if (fileToRetrieve.isLocked()) {
-			throw new IllegalArgumentException(filename
-					+ " est déjà verrouillé par "
-					+ fileToRetrieve.getClientId());
+			throw new IllegalArgumentException(filename + " est déjà verrouillé par "
+			    + fileToRetrieve.getClientId());
 		}
 
 		fileToRetrieve.setClientId(clientId);
@@ -98,8 +95,7 @@ public class Server implements ServerInterface {
 		FilePoly fileToRetrieve = fileMap.get(filename);
 
 		if (fileToRetrieve == null) {
-			throw new IllegalArgumentException("Le fichier " + filename
-					+ " n'existe pas.");
+			throw new IllegalArgumentException("Le fichier " + filename + " n'existe pas.");
 		}
 
 		if (fileToRetrieve.getChecksum().equals(checksum)) {
@@ -115,14 +111,12 @@ public class Server implements ServerInterface {
 		StringBuilder output = new StringBuilder();
 
 		for (FilePoly file : fileMap.values()) {
-			String clientId = file.getClientId() != null ? "vérouillé par "
-					+ file.getClientId() : " non vérrouillé";
-			output.append(file.getFilename()).append(" ").append(clientId)
-					.append("\n");
+			String clientId = file.getClientId() != null ? "vérouillé par " + file.getClientId()
+			    : " non vérrouillé";
+			output.append(file.getFilename()).append(" ").append(clientId).append("\n");
 		}
 
-		return output.append(fileMap.values().size()).append(" fichier(s)")
-				.toString();
+		return output.append(fileMap.values().size()).append(" fichier(s)").toString();
 	}
 
 	@Override
