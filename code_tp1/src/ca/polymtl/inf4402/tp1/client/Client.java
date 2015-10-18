@@ -71,7 +71,7 @@ public class Client {
 				break;
 			case GET:
 				get(filename);
-				System.out.println(filename + " a ete synchronise");
+				System.out.println(filename + " à été synchronisé");
 				break;
 			case LIST:
 				System.out.println(localServerStub.list());

@@ -7,7 +7,7 @@ public class FilePoly {
 	private String checksum;
 	private byte[] data;
 
-	public FilePoly(String filename, String clientId, String checksum, byte[] data) throws java.rmi.RemoteException {
+	public FilePoly(String filename, String clientId, String checksum, byte[] data) {
 		this.filename = filename;
 		this.clientId = clientId;
 		this.checksum = checksum;

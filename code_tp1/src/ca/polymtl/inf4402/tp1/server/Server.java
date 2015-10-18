@@ -13,8 +13,6 @@ import ca.polymtl.inf4402.tp1.shared.ServerInterface;
 import ca.polymtl.inf4402.tp1.shared.Utils;
 
 public class Server implements ServerInterface {
-
-	// Key = Filename, Value = checksum md5
 	private Map<String, FilePoly> fileMap = new HashMap<String, FilePoly>();
 	private final byte[] EMPTY_FILE = new byte[0];
 	private static int clientId = 0;
@@ -57,7 +55,7 @@ public class Server implements ServerInterface {
 	@Override
 	public String create(String filename) {
 		if (fileMap.containsKey(filename)) {
-			return filename + " existe deja";
+			return filename + " existe déjà";
 		}
 		try {
 			String checksum = Utils.toMd5(EMPTY_FILE);
@@ -65,10 +63,8 @@ public class Server implements ServerInterface {
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			return "Erreur lors de la creation du fichier " + filename;
-		} catch (RemoteException e) {
-			e.printStackTrace();
 		}
-		return filename + " a ete ajoute";
+		return filename + " à été ajouté";
 	}
 
 	@Override
@@ -80,12 +76,12 @@ public class Server implements ServerInterface {
 		}
 
 		if (fileToRetrieve.isLocked()) {
-			return filename + " est deja verouille par " + fileToRetrieve.getClientId();
+			return filename + " est déjà verrouillé par " + fileToRetrieve.getClientId();
 		}
 
 		fileToRetrieve.setClientId(clientId);
 
-		return filename + " a ete verouille";
+		return filename + " a été verrouillé";
 	}
 
 	@Override
@@ -109,7 +105,7 @@ public class Server implements ServerInterface {
 		StringBuilder output = new StringBuilder();
 
 		for (FilePoly file : fileMap.values()) {
-			String clientId = file.getClientId() != null ? "verouille par " + file.getClientId() : " non verouille";
+			String clientId = file.getClientId() != null ? "vérouillé par " + file.getClientId() : " non vérrouillé";
 			output.append(file.getFilename()).append(" ").append(clientId).append("\n");
 		}
 
