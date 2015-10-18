@@ -93,12 +93,27 @@ public class Client {
 				System.out.println(localServerStub.push(filename, data, clientId));
 				break;
 			case SYNC_LOCAL_DIR:
+				int countSyncedFiles = syncLocalDir();
+				System.out.println(countSyncedFiles + " fichier(s) ont été téléchargés");
 				break;
 			}
 		} catch (RemoteException e) {
 			System.out.println("Erreur avec le serveur");
 		}
 
+	}
+	
+	private int syncLocalDir() throws RemoteException{
+		String wannabeJson = localServerStub.syncLocalDir();
+		String[] files = wannabeJson.split(ServerInterface.DELIMITER);
+		int count = files.length > 0 ? files.length / 2 : 0;
+		for(int i = 0; i < count; i+=2){
+			String filename = files[i];
+			byte[] data = files[i+1].getBytes();
+			saveFileToLocal(filename, data);
+		}
+		
+		return count;
 	}
 
 	private void get(String filename) throws RemoteException, NoSuchAlgorithmException {

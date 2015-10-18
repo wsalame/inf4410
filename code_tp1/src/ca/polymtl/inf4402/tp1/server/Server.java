@@ -138,10 +138,16 @@ public class Server implements ServerInterface {
 
 	@Override
 	public String syncLocalDir() throws RemoteException {
-		StringBuilder wannabeJsonBuilder = new StringBuilder("{");
+		StringBuilder wannabeJsonBuilder = new StringBuilder();
 		for (FilePoly file : fileMap.values()) {
-			wannabeJsonBuilder.append(file.getExportData());
+			wannabeJsonBuilder.append(file.getExportData()).append(DELIMITER);
 		}
-		return wannabeJsonBuilder.append("}").toString();
+		
+		wannabeJsonBuilder.delete(wannabeJsonBuilder.length() - 2, wannabeJsonBuilder.length() - 1);
+		
+		String json = wannabeJsonBuilder.toString();
+		System.out.println(json);
+		
+		return json;
 	}
 }
