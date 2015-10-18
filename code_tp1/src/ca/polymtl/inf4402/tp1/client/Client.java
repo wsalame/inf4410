@@ -106,14 +106,15 @@ public class Client {
 	private int syncLocalDir() throws RemoteException{
 		String wannabeJson = localServerStub.syncLocalDir();
 		String[] files = wannabeJson.split(ServerInterface.DELIMITER);
-		int count = files.length > 0 ? files.length / 2 : 0;
-		for(int i = 0; i < count; i+=2){
+		
+		for(int i = 0; i < files.length; i+=2){
 			String filename = files[i];
 			byte[] data = files[i+1].getBytes();
 			saveFileToLocal(filename, data);
 		}
 		
-		return count;
+		int numberOfFiles = files.length > 0 ? files.length / 2 : 0;
+		return numberOfFiles;
 	}
 
 	private void get(String filename) throws RemoteException, NoSuchAlgorithmException {

@@ -143,10 +143,11 @@ public class Server implements ServerInterface {
 			wannabeJsonBuilder.append(file.getExportData()).append(DELIMITER);
 		}
 		
-		wannabeJsonBuilder.delete(wannabeJsonBuilder.length() - 2, wannabeJsonBuilder.length() - 1);
+		if(!fileMap.values().isEmpty()){
+			wannabeJsonBuilder.delete(wannabeJsonBuilder.lastIndexOf(DELIMITER), wannabeJsonBuilder.length());
+		}
 		
 		String json = wannabeJsonBuilder.toString();
-		System.out.println(json);
 		
 		return json;
 	}
