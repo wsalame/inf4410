@@ -63,8 +63,12 @@ public class Client {
 	}
 
 	private void run(AllowedCommand command, String filename) throws NoSuchAlgorithmException {
-		String checksum = filename != null ? getChecksum(filename) : null;
 		try {
+			String clientId = hasClientId() ? getClientIdFromLocal()
+					: generateClientIdAndSave(localServerStub.generateClientId());
+
+			String checksum = filename != null ? getChecksum(filename) : null;
+
 			switch (command) {
 			case CREATE:
 				System.out.println(localServerStub.create(filename));
@@ -77,19 +81,17 @@ public class Client {
 				System.out.println(localServerStub.list());
 				break;
 			case LOCK:
-				if (checksum != null) {
-					String clientId = hasClientId() ? getClientIdFromLocal() : generateClientIdAndSave(localServerStub.generateClientId());
+				byte[] potentialNewData = localServerStub.lock(filename, clientId, checksum);
 
-					System.out.println(localServerStub.lock(filename, clientId, checksum));
-
-//					get(filename);
-				} else {
-					System.out.println("Vous devez 'get' le fichier en premier !");
+				if (potentialNewData != null) {
+					System.out.println("NEW DATA");
+					saveFileToLocal(filename, potentialNewData);
 				}
+
+				System.out.println(filename + " à été verrouillé");
 				break;
 			case PUSH:
 				byte[] data = getDataFromLocal(filename);
-				String clientId = hasClientId() ? getClientIdFromLocal() : generateClientIdAndSave(localServerStub.generateClientId());
 				System.out.println(localServerStub.push(filename, data, clientId));
 				break;
 			case SYNC_LOCAL_DIR:
@@ -102,18 +104,18 @@ public class Client {
 		}
 
 	}
-	
-	private int syncLocalDir() throws RemoteException{
+
+	private int syncLocalDir() throws RemoteException {
 		String[][] files = localServerStub.syncLocalDir();
-		
-		//Extracting the data
-		for(int i = 0; i < files.length; i++){
+
+		// Extracting the data
+		for (int i = 0; i < files.length; i++) {
 			String filename = files[i][0];
 			byte[] data = files[i][1].getBytes();
 			saveFileToLocal(filename, data);
 			System.out.println(filename);
 		}
-		
+
 		int numberOfFiles = files.length;
 		return numberOfFiles;
 	}
@@ -135,8 +137,7 @@ public class Client {
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
 		} catch (NotBoundException e) {
-			System.out.println("Erreur: Le nom '" + e.getMessage()
-			    + "' n'est pas défini dans le registre.");
+			System.out.println("Erreur: Le nom '" + e.getMessage() + "' n'est pas défini dans le registre.");
 		} catch (AccessException e) {
 			System.out.println("Erreur: " + e.getMessage());
 		} catch (RemoteException e) {

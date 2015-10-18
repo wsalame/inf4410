@@ -73,8 +73,12 @@ public class Server implements ServerInterface {
 		fileMap.put(filename, new FilePoly(filename, clientId, checksum, data));
 	}
 
+	/**
+	 * TODO ajouter description du tp
+	 * @return Si le checksum est different, retourne le data, sinon null;
+	 */
 	@Override
-	public String lock(String filename, String clientId, String checksum) {
+	public byte[] lock(String filename, String clientId, String checksum) {
 		FilePoly fileToRetrieve = fileMap.get(filename);
 
 		if (fileToRetrieve == null) {
@@ -87,8 +91,10 @@ public class Server implements ServerInterface {
 		}
 
 		fileToRetrieve.setClientId(clientId);
+		
+		
 
-		return filename + " a été verrouillé";
+		return fileToRetrieve.getChecksum().equals(checksum) ? null : fileToRetrieve.getData();
 	}
 
 	@Override
@@ -124,12 +130,14 @@ public class Server implements ServerInterface {
 	public String push(String filename, byte[] data, String clientId) {
 		FilePoly fileToRetrieve = fileMap.get(filename);
 
-		if (fileToRetrieve == null || !fileToRetrieve.getClientId().equals(clientId)) {
+		if (fileToRetrieve == null || !fileToRetrieve.isLocked() || !fileToRetrieve.getClientId().equals(clientId)) {
 			return filename + " doit être verrouillé";
 		}
 
 		try {
 			createInMemory(filename, data, clientId);
+			fileToRetrieve.setClientId(null);
+			fileMap.put(filename, fileToRetrieve);
 		} catch (NoSuchAlgorithmException e) {
 			return "Erreur lors de la création du fichier " + filename;
 		}
