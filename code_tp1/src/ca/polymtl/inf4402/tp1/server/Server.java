@@ -1,6 +1,7 @@
 package ca.polymtl.inf4402.tp1.server;
 
 import java.rmi.ConnectException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -111,9 +112,9 @@ public class Server implements ServerInterface {
 		StringBuilder output = new StringBuilder();
 
 		for (FilePoly file : fileMap.values()) {
-			String clientId = file.getClientId() != null ? "vérouillé par " + file.getClientId()
+			String clientId = file.getClientId() != null ? " vérouillé par " + file.getClientId()
 			    : " non vérrouillé";
-			output.append(file.getFilename()).append(" ").append(clientId).append("\n");
+			output.append(file.getFilename()).append(clientId).append("\n");
 		}
 
 		return output.append(fileMap.values().size()).append(" fichier(s)").toString();
@@ -133,5 +134,14 @@ public class Server implements ServerInterface {
 			return "Erreur lors de la création du fichier " + filename;
 		}
 		return filename + " a été envoyé au serveur";
+	}
+
+	@Override
+	public String syncLocalDir() throws RemoteException {
+		StringBuilder wannabeJsonBuilder = new StringBuilder("{");
+		for (FilePoly file : fileMap.values()) {
+			wannabeJsonBuilder.append(file.getExportData());
+		}
+		return wannabeJsonBuilder.append("}").toString();
 	}
 }

@@ -45,4 +45,11 @@ public class FilePoly {
 	public void setData(byte[] data) {
 		this.data = data;
 	}
+	
+	public String getExportData(){
+		StringBuilder wannabeJsonBuilder = new StringBuilder();
+		wannabeJsonBuilder.append("[").append(getFilename()).append("],").append("[")
+    .append(new String(getData())).append("]");
+		return wannabeJsonBuilder.toString();
+	}
 }

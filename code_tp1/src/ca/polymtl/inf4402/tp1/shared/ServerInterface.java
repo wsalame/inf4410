@@ -37,5 +37,7 @@ public interface ServerInterface extends Remote {
 	
 	String list() throws RemoteException;
 	
-	String push(String filename, byte[] data, String clientId);
+	String push(String filename, byte[] data, String clientId) throws RemoteException;
+	
+	String syncLocalDir() throws RemoteException;
 }

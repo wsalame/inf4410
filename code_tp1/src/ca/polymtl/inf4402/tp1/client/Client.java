@@ -78,8 +78,7 @@ public class Client {
 				break;
 			case LOCK:
 				if (checksum != null) {
-					String clientId = hasClientId() ? getClientIdFromLocal()
-					    : generateClientIdAndSave(localServerStub.generateClientId());
+					String clientId = hasClientId() ? getClientIdFromLocal() : generateClientIdAndSave(localServerStub.generateClientId());
 
 					System.out.println(localServerStub.lock(filename, clientId, checksum));
 
@@ -89,6 +88,9 @@ public class Client {
 				}
 				break;
 			case PUSH:
+				byte[] data = getDataFromLocal(filename);
+				String clientId = getClientIdFromLocal();
+				System.out.println(localServerStub.push(filename, data, clientId));
 				break;
 			case SYNC_LOCAL_DIR:
 				break;
