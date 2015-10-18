@@ -89,7 +89,7 @@ public class Client {
 				break;
 			case PUSH:
 				byte[] data = getDataFromLocal(filename);
-				String clientId = getClientIdFromLocal();
+				String clientId = hasClientId() ? getClientIdFromLocal() : generateClientIdAndSave(localServerStub.generateClientId());
 				System.out.println(localServerStub.push(filename, data, clientId));
 				break;
 			case SYNC_LOCAL_DIR:

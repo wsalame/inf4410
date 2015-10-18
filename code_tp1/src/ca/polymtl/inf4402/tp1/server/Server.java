@@ -112,7 +112,7 @@ public class Server implements ServerInterface {
 		StringBuilder output = new StringBuilder();
 
 		for (FilePoly file : fileMap.values()) {
-			String clientId = file.getClientId() != null ? " vérouillé par " + file.getClientId()
+			String clientId = file.getClientId() != null ? " verrouillé par " + file.getClientId()
 			    : " non vérrouillé";
 			output.append(file.getFilename()).append(clientId).append("\n");
 		}
@@ -124,8 +124,8 @@ public class Server implements ServerInterface {
 	public String push(String filename, byte[] data, String clientId) {
 		FilePoly fileToRetrieve = fileMap.get(filename);
 
-		if (!fileToRetrieve.getClientId().equals(clientId)) {
-			return filename + " doit être verouillé";
+		if (fileToRetrieve == null || !fileToRetrieve.getClientId().equals(clientId)) {
+			return filename + " doit être verrouillé";
 		}
 
 		try {
