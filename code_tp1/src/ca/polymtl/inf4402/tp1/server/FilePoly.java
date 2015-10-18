@@ -1,7 +1,5 @@
 package ca.polymtl.inf4402.tp1.server;
 
-import ca.polymtl.inf4402.tp1.shared.ServerInterface;
-
 public class FilePoly {
 
 	private String filename;
@@ -48,10 +46,11 @@ public class FilePoly {
 		this.data = data;
 	}
 	
-	public String getExportData(){
-		StringBuilder wannabeJsonBuilder = new StringBuilder();
-		wannabeJsonBuilder.append(getFilename()).append(ServerInterface.DELIMITER)
-    .append(new String(getData()));
-		return wannabeJsonBuilder.toString();
+	public String[] getExportData(){
+		String[] file = new String[2];
+		file[0] = getFilename();
+		file[1] = new String(getData());
+
+		return file;
 	}
 }

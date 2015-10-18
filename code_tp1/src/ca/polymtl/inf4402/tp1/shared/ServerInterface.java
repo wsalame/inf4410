@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface ServerInterface extends Remote {
-	public static String DELIMITER = "%%%%%%";
 	public enum AllowedCommand {
 		CREATE("create"), LIST("list"), SYNC_LOCAL_DIR("syncLocalDir"), GET("get"), LOCK("lock"), PUSH("push");
 
@@ -40,5 +39,5 @@ public interface ServerInterface extends Remote {
 	
 	String push(String filename, byte[] data, String clientId) throws RemoteException;
 	
-	String syncLocalDir() throws RemoteException;
+	String[][] syncLocalDir() throws RemoteException;
 }

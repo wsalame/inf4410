@@ -82,7 +82,7 @@ public class Client {
 
 					System.out.println(localServerStub.lock(filename, clientId, checksum));
 
-					get(filename);
+//					get(filename);
 				} else {
 					System.out.println("Vous devez 'get' le fichier en premier !");
 				}
@@ -104,16 +104,17 @@ public class Client {
 	}
 	
 	private int syncLocalDir() throws RemoteException{
-		String wannabeJson = localServerStub.syncLocalDir();
-		String[] files = wannabeJson.split(ServerInterface.DELIMITER);
+		String[][] files = localServerStub.syncLocalDir();
 		
-		for(int i = 0; i < files.length; i+=2){
-			String filename = files[i];
-			byte[] data = files[i+1].getBytes();
+		//Extracting the data
+		for(int i = 0; i < files.length; i++){
+			String filename = files[i][0];
+			byte[] data = files[i][1].getBytes();
 			saveFileToLocal(filename, data);
+			System.out.println(filename);
 		}
 		
-		int numberOfFiles = files.length > 0 ? files.length / 2 : 0;
+		int numberOfFiles = files.length;
 		return numberOfFiles;
 	}
 
