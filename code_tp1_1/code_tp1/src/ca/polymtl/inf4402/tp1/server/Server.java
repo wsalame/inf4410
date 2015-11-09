@@ -26,9 +26,9 @@ public class Server implements ServerInterface {
 
 		try {
 			ServerInterface stub = (ServerInterface) UnicastRemoteObject
-					.exportObject(this, 0);
+					.exportObject(this, 5002);
 
-			Registry registry = LocateRegistry.getRegistry();
+			Registry registry = LocateRegistry.getRegistry(5001);
 			registry.rebind("server", stub);
 			System.out.println("Server ready.");
 
