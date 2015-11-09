@@ -1,25 +1,22 @@
-package ca.polymtl.inf4402.tp1.server;
+package ca.polymtl.inf4402.tp2.server;
 
 import java.rmi.ConnectException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ca.polymtl.inf4402.tp1.shared.ServerInterface;
-import ca.polymtl.inf4402.tp1.shared.Utils;
+import ca.polymtl.inf4402.tp2.shared.ServerInterface;
 
 public class Server implements ServerInterface {
 
 	public static Map<Integer, Integer> servers = new HashMap<Integer, Integer>();
 	static{
 		servers.put(5001, 5002);
-		servers.put(5005, 5006);
-		servers.put(5008, 5009);
+//		servers.put(5005, 5006);
+//		servers.put(5008, 5009);
 		
 	}
 	public static void main(String[] args) {
