@@ -14,11 +14,14 @@ public class Server implements ServerInterface {
 
 	public static Map<Integer, Integer> servers = new HashMap<Integer, Integer>();
 	static{
-		servers.put(5001, 5002);
-//		servers.put(5005, 5006);
-//		servers.put(5008, 5009);
-		
+		servers.put(5003, 5004);
+		servers.put(5005, 5006);
+		servers.put(5008, 5009);
 	}
+	
+	int serverPort = 5002;
+	int rmiPort = 5001;
+	
 	public static void main(String[] args) {
 		Server server = new Server();
 		server.run();
@@ -29,11 +32,8 @@ public class Server implements ServerInterface {
 	}
 
 	private void run() {
-		for(Entry<Integer, Integer> entries : servers.entrySet()){
 			
-			int serverPort = entries.getValue();
-			int rmiPort = entries.getKey();
-			
+		
 			if (System.getSecurityManager() == null) {
 				System.setSecurityManager(new SecurityManager());
 			}
@@ -53,7 +53,6 @@ public class Server implements ServerInterface {
 			} catch (Exception e) {
 				System.err.println("Erreur: " + e.getMessage());
 			}
-		}
 		
 		
 	}
