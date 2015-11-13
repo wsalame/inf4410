@@ -51,6 +51,5 @@ public class Operation {
     public static OperationType valueOfCustom(String name) {
       return operations.get(name);
     }
-
   }
 }
