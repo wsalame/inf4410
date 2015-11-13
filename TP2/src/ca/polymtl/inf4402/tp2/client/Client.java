@@ -61,6 +61,9 @@ public class Client {
     int high = -1;
 
     int total = 0;
+    final int OFFSET_RETRY = 10;
+
+    int actualNumberOfOperationsExecuted = 0;
     for (Entry<WannabeServer, Integer> entry : operationsByServerMap.entrySet()) {
       WannabeServer server = entry.getKey();
       int operationsByServer = entry.getValue();
@@ -68,11 +71,22 @@ public class Client {
       low = high + 1;
       high += operationsByServer;
 
-      int result = server.executeCalculations(operations, low, high);
+      Integer result = server.executeCalculations(operations, low, high);
+      if (result == null) {
+        System.out.println("retry");
+        // Retry second time with less ops
+        high -= OFFSET_RETRY;
+        result = server.executeCalculations(operations, low, high);
+      }
 
-      System.out.println(result);
-      total += result;
+      if (result != null) {
+        actualNumberOfOperationsExecuted += high - low + 1;
+        System.out.println(result);
+        total += result;
+      }
     }
+
+    System.out.println(actualNumberOfOperationsExecuted);
 
     System.out.println(total);
   }

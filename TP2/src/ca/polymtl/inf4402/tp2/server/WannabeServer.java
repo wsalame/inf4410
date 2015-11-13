@@ -4,7 +4,7 @@ import ca.polymtl.inf4402.tp2.shared.Operation;
 
 public class WannabeServer {
 
-  private final int MAX_OPERATIONS_Qi = 200;
+  private final int MAX_OPERATIONS_Qi = 13;
 
   private boolean isAccepted(int requestedNumberOfOperations_ui) {
     double tauxRefus = ((double) requestedNumberOfOperations_ui - (double) MAX_OPERATIONS_Qi) / (9 * (double) MAX_OPERATIONS_Qi);
@@ -14,7 +14,7 @@ public class WannabeServer {
     }
 
     double randomNumber = Math.random();
-    return randomNumber < tauxRefus;
+    return randomNumber > tauxRefus;
   }
 
   public Integer executeCalculations(Operation[] operations, int low, int high) {
