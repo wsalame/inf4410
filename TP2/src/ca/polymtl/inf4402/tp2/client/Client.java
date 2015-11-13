@@ -72,7 +72,7 @@ public class Client {
     int total = 0;
     int actualNumberOfOperationsExecuted = 0;
     int operationsByServer = calculateNumberOfOperationsPerServer(operations.length, serversWrapper.size() - numberOfServersDown);
-
+    int low = 0;
     for (ServerStubWrapper serverWrapper : serversWrapper) {
       WannabeServer server = serverWrapper.getServer();
       if (!serverWrapper.isUp()) {
@@ -80,18 +80,14 @@ public class Client {
         continue;
       }
 
-      int low = high + 1;
+      low = high + 1;
       high += operationsByServer;
 
       Integer result = server.executeCalculations(operations, low, high);
       if (result == null) {
         System.out.println("retry");
         // Retry second time with less ops
-        low -= OFFSET_RETRY;
         high -= OFFSET_RETRY;
-        if (low < 0) {
-          low = 0;
-        }
         if (high < 0) {
           high = 0;
         }
@@ -105,7 +101,7 @@ public class Client {
       }
     }
 
-    boolean isCompleted = actualNumberOfOperationsExecuted == operations.length;
+    boolean isCompleted = actualNumberOfOperationsExecuted >= operations.length;
 
     System.out.println("Actual " + actualNumberOfOperationsExecuted);
 
