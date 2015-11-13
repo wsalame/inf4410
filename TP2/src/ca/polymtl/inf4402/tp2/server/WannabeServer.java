@@ -4,7 +4,7 @@ import ca.polymtl.inf4402.tp2.shared.Operation;
 
 public class WannabeServer {
 
-  private final int MAX_OPERATIONS_Qi = 13;
+  private final int MAX_OPERATIONS_Qi = 2;
 
   private boolean isAccepted(int requestedNumberOfOperations_ui) {
     double tauxRefus = ((double) requestedNumberOfOperations_ui - (double) MAX_OPERATIONS_Qi) / (9 * (double) MAX_OPERATIONS_Qi);
@@ -25,7 +25,7 @@ public class WannabeServer {
 
     int total = 0;
 
-    for (int i = low; i <= high; i++) {
+    for (int i = low; i <= high && i < operations.length; i++) {
       total += operations[i].execute() % 5000;
     }
 

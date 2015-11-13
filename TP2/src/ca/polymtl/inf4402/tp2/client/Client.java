@@ -1,10 +1,7 @@
 package ca.polymtl.inf4402.tp2.client;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import ca.polymtl.inf4402.tp2.server.WannabeServer;
 import ca.polymtl.inf4402.tp2.shared.Operation;
 import ca.polymtl.inf4402.tp2.shared.ServerInterface;
@@ -28,12 +25,14 @@ public class Client {
     // localServerStub = loadServerStub("127.0.0.1");
   }
 
-  volatile int total = 0;
+  private List<ServerStubWrapper> serversWrapper = new ArrayList<ServerStubWrapper>();
+  private Operation[] operations;
+  private final int OFFSET_RETRY = 10;
+  private int numberOfServersDown = 0;
 
-  private void run(String path) {
-
+  private void setup(String path) {
     List<String> lines = Utils.readFile(path);
-    Operation[] operations = new Operation[lines.size()];
+    operations = new Operation[lines.size()];
 
     for (int i = 0; i < lines.size(); i++) {
       String[] split = lines.get(i).split(" ");
@@ -45,28 +44,38 @@ public class Client {
     servers.add(new WannabeServer());
     servers.add(new WannabeServer());
 
-    Map<WannabeServer, Integer> operationsByServerMap = new HashMap<WannabeServer, Integer>();
+    for (WannabeServer server : servers) {
+      serversWrapper.add(new ServerStubWrapper(server, true));
+    }
+  }
 
-    final int numberOfOperationsPerServer = operations.length / servers.size();
+  private void run(String path) {
+    setup(path);
 
-    int totalAdded = 0;
-    for (int i = 0; i < servers.size() - 1; i++) {
-      totalAdded += numberOfOperationsPerServer;
-      operationsByServerMap.put(servers.get(i), numberOfOperationsPerServer);
+    int total = execute(0, -1, operations.length);
+
+    System.out.println(total);
+  }
+
+  int numberOfAttempts = 0;
+  private final int MAX_ATTEMPTS = 2;
+
+  private int execute(int low, int high, int numberOfOperations) {
+    if (numberOfAttempts > MAX_ATTEMPTS) {
+      System.out.println("Le résultat complet n'a pu être calculé");
+      return 0;
     }
 
-    operationsByServerMap.put(servers.get(servers.size() - 1), operations.length - totalAdded);
-
-    int low = 0;
-    int high = -1;
-
     int total = 0;
-    final int OFFSET_RETRY = 10;
-
     int actualNumberOfOperationsExecuted = 0;
-    for (Entry<WannabeServer, Integer> entry : operationsByServerMap.entrySet()) {
-      WannabeServer server = entry.getKey();
-      int operationsByServer = entry.getValue();
+
+    for (ServerStubWrapper serverWrapper : serversWrapper) {
+      WannabeServer server = serverWrapper.getServer();
+      if (!serverWrapper.isUp()) {
+        numberOfServersDown++;
+        continue;
+      }
+      int operationsByServer = calculateNumberOfOperationsPerServer(numberOfOperations, serversWrapper.size() - numberOfServersDown);
 
       low = high + 1;
       high += operationsByServer;
@@ -86,9 +95,16 @@ public class Client {
       }
     }
 
-    System.out.println(actualNumberOfOperationsExecuted);
+    boolean isCompleted = actualNumberOfOperationsExecuted == numberOfOperations;
 
-    System.out.println(total);
+    System.out.println("Actual " + actualNumberOfOperationsExecuted);
+
+    numberOfAttempts++;
+    return total + (!isCompleted ? execute(low, high, numberOfOperations - actualNumberOfOperationsExecuted) : 0);
+  }
+
+  private int calculateNumberOfOperationsPerServer(int countOperations, int countServer) {
+    return countOperations / countServer;
   }
   //
   // private ServerInterface loadServerStub(String hostname) {
