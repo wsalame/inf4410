@@ -1,7 +1,12 @@
 package ca.polymtl.inf4402.tp2.client;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import ca.polymtl.inf4402.tp2.server.WannabeServer;
+import ca.polymtl.inf4402.tp2.shared.Operation;
 import ca.polymtl.inf4402.tp2.shared.ServerInterface;
 
 public class Client {
@@ -23,9 +28,54 @@ public class Client {
     // localServerStub = loadServerStub("127.0.0.1");
   }
 
+  volatile int total = 0;
+
   private void run(String path) {
+
     List<String> lines = Utils.readFile(path);
-    System.out.println(Arrays.toString(lines.toArray()));
+    List<Operation> operationList = new ArrayList<Operation>();
+
+    for (String line : lines) {
+      String[] split = line.split(" ");
+      operationList.add(new Operation(split[0], split[1]));
+    }
+
+    List<WannabeServer> servers = new ArrayList<WannabeServer>();
+    servers.add(new WannabeServer());
+    servers.add(new WannabeServer());
+    servers.add(new WannabeServer());
+
+    Map<WannabeServer, Integer> operationsByServerMap = new HashMap<WannabeServer, Integer>();
+
+    final int numberOfOperationsPerServer = operationList.size() / servers.size();
+
+    int totalAdded = 0;
+    for (int i = 0; i < servers.size() - 1; i++) {
+      totalAdded += numberOfOperationsPerServer;
+      operationsByServerMap.put(servers.get(i), numberOfOperationsPerServer);
+    }
+
+    operationsByServerMap.put(servers.get(servers.size() - 1), operationList.size() - totalAdded);
+
+    Operation[] operations = operationList.toArray(new Operation[operationList.size()]);
+    int low = 0;
+    int high = 0;
+
+    int total = 0;
+    for (Entry<WannabeServer, Integer> entry : operationsByServerMap.entrySet()) {
+      WannabeServer server = entry.getKey();
+      int operationsByServer = entry.getValue();
+
+      high += operationsByServer;
+
+      int result = server.executeCalculations(operations, low, high);
+      low = high + 1;
+
+      System.out.println(result);
+      total += result;
+    }
+
+    System.out.println(total);
   }
   //
   // private ServerInterface loadServerStub(String hostname) {
