@@ -33,11 +33,11 @@ public class Client {
   private void run(String path) {
 
     List<String> lines = Utils.readFile(path);
-    List<Operation> operationList = new ArrayList<Operation>();
+    Operation[] operations = new Operation[lines.size()];
 
-    for (String line : lines) {
-      String[] split = line.split(" ");
-      operationList.add(new Operation(split[0], split[1]));
+    for (int i = 0; i < lines.size(); i++) {
+      String[] split = lines.get(i).split(" ");
+      operations[i] = new Operation(split[0], split[1]);
     }
 
     List<WannabeServer> servers = new ArrayList<WannabeServer>();
@@ -47,7 +47,7 @@ public class Client {
 
     Map<WannabeServer, Integer> operationsByServerMap = new HashMap<WannabeServer, Integer>();
 
-    final int numberOfOperationsPerServer = operationList.size() / servers.size();
+    final int numberOfOperationsPerServer = operations.length / servers.size();
 
     int totalAdded = 0;
     for (int i = 0; i < servers.size() - 1; i++) {
@@ -55,21 +55,20 @@ public class Client {
       operationsByServerMap.put(servers.get(i), numberOfOperationsPerServer);
     }
 
-    operationsByServerMap.put(servers.get(servers.size() - 1), operationList.size() - totalAdded);
+    operationsByServerMap.put(servers.get(servers.size() - 1), operations.length - totalAdded);
 
-    Operation[] operations = operationList.toArray(new Operation[operationList.size()]);
     int low = 0;
-    int high = 0;
+    int high = -1;
 
     int total = 0;
     for (Entry<WannabeServer, Integer> entry : operationsByServerMap.entrySet()) {
       WannabeServer server = entry.getKey();
       int operationsByServer = entry.getValue();
 
+      low = high + 1;
       high += operationsByServer;
 
       int result = server.executeCalculations(operations, low, high);
-      low = high + 1;
 
       System.out.println(result);
       total += result;

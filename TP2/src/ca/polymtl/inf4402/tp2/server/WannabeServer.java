@@ -9,7 +9,12 @@ public class WannabeServer {
   private boolean isAccepted(int requestedNumberOfOperations_ui) {
     double tauxRefus = ((double) requestedNumberOfOperations_ui - (double) MAX_OPERATIONS_Qi) / (9 * (double) MAX_OPERATIONS_Qi);
 
-    return Math.random() < tauxRefus;
+    if (tauxRefus < 0) {
+      tauxRefus = 1;
+    }
+
+    double randomNumber = Math.random();
+    return randomNumber < tauxRefus;
   }
 
   public Integer executeCalculations(Operation[] operations, int low, int high) {
