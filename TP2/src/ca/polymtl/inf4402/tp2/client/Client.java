@@ -29,7 +29,6 @@ public class Client {
 
   private List<ServerStubWrapper> serversWrapper = new ArrayList<ServerStubWrapper>();
   private Operation[] operations;
-  private final int OFFSET_RETRY = 10;
   private int numberOfServersDown = 0;
 
   private void setup(String path) {
@@ -87,7 +86,7 @@ public class Client {
       if (result == null) {
         System.out.println("retry");
         // Retry second time with less ops
-        high -= OFFSET_RETRY;
+        high = low + operationsByServer / 3;
         if (high < 0) {
           high = 0;
         }
@@ -98,17 +97,18 @@ public class Client {
         actualNumberOfOperationsExecuted += high - low + 1;
         System.out.println(result);
         total += result;
+      } else {
+        System.out.println("Les calculs entre les positions suivantes n'ont pu etre calcules : [" + low + "," + high + "]");
       }
     }
 
     boolean isCompleted = actualNumberOfOperationsExecuted >= operations.length;
 
-    System.out.println("Actual " + actualNumberOfOperationsExecuted);
-
     Operation[] operationsNew = null;
     if (!isCompleted) {
-      operationsNew = new Operation[operations.length - actualNumberOfOperationsExecuted];
-      for (int i = high + 1, j = 0; i < operations.length; i++, j++) {
+      operationsNew = new Operation[operations.length - high - 1];
+      int j = 0;
+      for (int i = high + 1; i < operations.length; i++, j++) {
         operationsNew[j] = operations[i];
       }
     }

@@ -1,5 +1,8 @@
 package ca.polymtl.inf4402.tp2.shared;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Methodes utilitaires pour effectuer les operations du TP2.
  * 
@@ -10,12 +13,21 @@ package ca.polymtl.inf4402.tp2.shared;
  */
 public class Calculator {
 
+  static Map<Integer, Integer> cache = new HashMap<Integer, Integer>();
+
   public static int fib(int x) {
     if (x == 0)
       return 0;
     if (x == 1)
       return 1;
-    return fib(x - 1) + fib(x - 2);
+
+    if (cache.containsKey(x)) {
+      return cache.get(x);
+    }
+
+    int result = fib(x - 1) + fib(x - 2);
+    cache.put(x, result);
+    return result;
   }
 
   public static int prime(int x) {
