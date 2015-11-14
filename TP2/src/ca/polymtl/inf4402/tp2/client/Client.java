@@ -63,7 +63,7 @@ public class Client {
 
   private int execute(Operation[] operations) {
     if (numberOfAttempts > MAX_ATTEMPTS) {
-      System.out.println("Le résultat complet n'a pu être calculé");
+      System.out.println("Le résultat complet n'a pu être calculé, car une partie des calculs ont été refusés trop de fois (max retries exceeded)");
       return 0;
     }
 
@@ -97,8 +97,6 @@ public class Client {
         actualNumberOfOperationsExecuted += high - low + 1;
         System.out.println(result);
         total += result;
-      } else {
-        System.out.println("Les calculs entre les positions suivantes n'ont pu etre calcules : [" + low + "," + high + "]");
       }
     }
 
