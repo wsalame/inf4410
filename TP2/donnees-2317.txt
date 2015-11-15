@@ -6,3 +6,14 @@ prime 207926
 fib 27
 fib 11
 fib 14
+prime 208358
+fib 27
+fib 11
+prime 14290
+prime 143373
+fib 40
+fib 18
+prime 143373
+fib 40
+prime 18958
+prime 5961

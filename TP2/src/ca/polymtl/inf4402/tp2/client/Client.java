@@ -19,7 +19,7 @@ public class Client {
 
 	public static void main(String[] args) {
 		Client client = new Client();
-		client.run("donnees-2317.txt");
+		client.run("donnees-2606.txt");
 	}
 
 	public Client() {
@@ -69,7 +69,7 @@ public class Client {
 
 		int total = execute(operations);
 
-		System.out.println("Total " + total);
+		System.out.println("Total of all operations = " + total);
 	}
 
 	private int execute(Operation[] operations) {
