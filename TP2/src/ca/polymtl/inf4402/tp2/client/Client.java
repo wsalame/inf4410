@@ -36,6 +36,9 @@ public class Client {
 	private Operation[] operations;
 	private int numberOfServersDown = 0;
 
+	private int numberOfAttempts = 0;
+	private final int MAX_ATTEMPTS = 2;
+
 	private void setup(String path) {
 		List<String> lines = Utils.readFile(path);
 		operations = new Operation[lines.size()];
@@ -61,9 +64,6 @@ public class Client {
 		System.out.println(total);
 	}
 
-	int numberOfAttempts = 0;
-	private final int MAX_ATTEMPTS = 2;
-
 	private int execute(Operation[] operations) {
 		if (numberOfAttempts > MAX_ATTEMPTS) {
 			System.out.println(
@@ -76,6 +76,7 @@ public class Client {
 		int actualNumberOfOperationsExecuted = 0;
 		int operationsByServer = calculateNumberOfOperationsPerServer(operations.length,
 				serversWrapper.size() - numberOfServersDown);
+		
 		int low = 0;
 		for (ServerStubWrapper serverWrapper : serversWrapper) {
 			ServerInterface server = serverWrapper.getServer();

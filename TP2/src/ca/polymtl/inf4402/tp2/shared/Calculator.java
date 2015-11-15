@@ -13,44 +13,48 @@ import java.util.Map;
  */
 public class Calculator {
 
-  static Map<Integer, Integer> cache = new HashMap<Integer, Integer>();
+	static Map<Integer, Integer> cache = new HashMap<Integer, Integer>();
 
-  public static int fib(int x) {
-    if (x == 0)
-      return 0;
-    if (x == 1)
-      return 1;
+	private final static boolean USE_CACHE = true;
 
-    if (cache.containsKey(x)) {
-      return cache.get(x);
-    }
+	public static int fib(int x) {
+		if (x == 0)
+			return 0;
+		if (x == 1)
+			return 1;
 
-    int result = fib(x - 1) + fib(x - 2);
-    cache.put(x, result);
-    return result;
-  }
+		if (USE_CACHE) {
+			if (cache.containsKey(x)) {
+				return cache.get(x);
+			}
+		}
 
-  public static int prime(int x) {
-    int highestPrime = 0;
+		int result = fib(x - 1) + fib(x - 2);
+		cache.put(x, result);
+		return result;
+	}
 
-    for (int i = 1; i <= x; ++i) {
-      if (isPrime(i) && x % i == 0 && i > highestPrime)
-        highestPrime = i;
-    }
+	public static int prime(int x) {
+		int highestPrime = 0;
 
-    return highestPrime;
-  }
+		for (int i = 1; i <= x; ++i) {
+			if (isPrime(i) && x % i == 0 && i > highestPrime)
+				highestPrime = i;
+		}
 
-  private static boolean isPrime(int x) {
-    if (x <= 1)
-      return false;
+		return highestPrime;
+	}
 
-    for (int i = 2; i < x; ++i) {
-      if (x % i == 0)
-        return false;
-    }
+	private static boolean isPrime(int x) {
+		if (x <= 1)
+			return false;
 
-    return true;
-  }
+		for (int i = 2; i < x; ++i) {
+			if (x % i == 0)
+				return false;
+		}
+
+		return true;
+	}
 
 }

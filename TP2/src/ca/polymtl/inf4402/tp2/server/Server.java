@@ -4,22 +4,13 @@ import java.rmi.ConnectException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
 
 import ca.polymtl.inf4402.tp2.shared.Operation;
 import ca.polymtl.inf4402.tp2.shared.ServerInterface;
 
 public class Server implements ServerInterface {
 
-	public static Map<Integer, Integer> servers = new HashMap<Integer, Integer>();
 	private final int MAX_OPERATIONS_Qi = 20;
-
-	static {
-		servers.put(5003, 5004);
-		servers.put(5005, 5006);
-		servers.put(5008, 5009);
-	}
 
 	int serverPort = 5021;
 	int rmiPort = 5020;
@@ -60,17 +51,18 @@ public class Server implements ServerInterface {
 				/ (9 * (double) MAX_OPERATIONS_Qi);
 
 		if (tauxRefus < 0) {
-			tauxRefus = 1;
+			tauxRefus = 0;
 		}
 
 		double randomNumber = Math.random();
+		
 		return randomNumber > tauxRefus;
 	}
 
 	@Override
 	public Integer executeCalculations(Operation[] operations, int low, int high) {
 		int numberOfOperations = high - low + 1;
-		if (numberOfOperations == 0) {
+		if (!isAccepted(numberOfOperations) || numberOfOperations == 0) {
 			return null;
 		}
 
