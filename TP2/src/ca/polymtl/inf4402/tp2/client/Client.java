@@ -15,7 +15,7 @@ import ca.polymtl.inf4402.tp2.shared.ServerInterface;
 
 public class Client {
 
-	private ServerInterface localServerStub = null;
+	
 
 	public static void main(String[] args) {
 		Client client = new Client();
@@ -28,8 +28,6 @@ public class Client {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
-
-		localServerStub = loadServerStub("127.0.0.1");
 	}
 
 	private List<ServerStubWrapper> serversWrapper = new ArrayList<ServerStubWrapper>();
@@ -39,20 +37,30 @@ public class Client {
 	private int numberOfAttempts = 0;
 	private final int MAX_ATTEMPTS = 2;
 
-	private void setup(String path) {
-		List<String> lines = Utils.readFile(path);
+	private void setup(String operationsPath) {
+		loadOperations(operationsPath);
+		loadServers();
+	}
+	
+	private void loadServers(){
+		List<String> lines = Utils.readFile("serversHostname");
+		List<ServerInterface> servers = new ArrayList<ServerInterface>();
+
+		for(String serverConfig : lines){
+			String[] config = serverConfig.split(" ");
+			ServerInterface serverStub = loadServerStub(config[0], Integer.parseInt(config[1]));
+			servers.add(serverStub);
+			serversWrapper.add(new ServerStubWrapper(serverStub, true));
+		}
+	}
+	
+	private void loadOperations(String operationsPath){
+		List<String> lines = Utils.readFile(operationsPath);
 		operations = new Operation[lines.size()];
 
 		for (int i = 0; i < lines.size(); i++) {
 			String[] split = lines.get(i).split(" ");
 			operations[i] = new Operation(split[0], split[1]);
-		}
-
-		List<ServerInterface> servers = new ArrayList<ServerInterface>();
-		servers.add(localServerStub);
-
-		for (ServerInterface server : servers) {
-			serversWrapper.add(new ServerStubWrapper(server, true));
 		}
 	}
 
@@ -135,11 +143,11 @@ public class Client {
 		return BigDecimal.valueOf(number).setScale(0, RoundingMode.UP).intValue();
 	}
 
-	private ServerInterface loadServerStub(String hostname) {
+	private ServerInterface loadServerStub(String hostname, int port) {
 		ServerInterface stub = null;
 
 		try {
-			Registry registry = LocateRegistry.getRegistry(hostname, 5020);
+			Registry registry = LocateRegistry.getRegistry(hostname, port);
 			stub = (ServerInterface) registry.lookup("server");
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());

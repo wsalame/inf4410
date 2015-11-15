@@ -4,18 +4,22 @@ import java.rmi.ConnectException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 import ca.polymtl.inf4402.tp2.shared.Operation;
 import ca.polymtl.inf4402.tp2.shared.ServerInterface;
+import ca.polymtl.inf4402.tp2.shared.UtilsServer;
 
 public class Server implements ServerInterface {
 
-	private final int MAX_OPERATIONS_Qi = 20;
+	private int maxOperations_Qi;
 
-	int serverPort = 5021;
-	int rmiPort = 5020;
+	int rmiPort;
+	int serverPort;
 
 	public static void main(String[] args) {
+		
+		
 		Server server = new Server();
 		server.run();
 	}
@@ -28,7 +32,12 @@ public class Server implements ServerInterface {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
-
+		
+		List<String> configLines = UtilsServer.readFile("serverConfig");
+		rmiPort = Integer.parseInt(configLines.get(0).substring(configLines.get(0).indexOf("=") + 1));
+		serverPort = Integer.parseInt(configLines.get(1).substring(configLines.get(1).indexOf("=") + 1));
+		maxOperations_Qi = Integer.parseInt(configLines.get(2).substring(configLines.get(2).indexOf("=") + 1));
+		
 		try {
 			ServerInterface stub = (ServerInterface) UnicastRemoteObject.exportObject(this, serverPort);
 			Registry registry = LocateRegistry.getRegistry(rmiPort);
@@ -47,8 +56,8 @@ public class Server implements ServerInterface {
 
 
 	private boolean isAccepted(int requestedNumberOfOperations_ui) {
-		double tauxRefus = ((double) requestedNumberOfOperations_ui - (double) MAX_OPERATIONS_Qi)
-				/ (9 * (double) MAX_OPERATIONS_Qi);
+		double tauxRefus = ((double) requestedNumberOfOperations_ui - (double) maxOperations_Qi)
+				/ (9 * (double) maxOperations_Qi);
 
 		if (tauxRefus < 0) {
 			tauxRefus = 0;
