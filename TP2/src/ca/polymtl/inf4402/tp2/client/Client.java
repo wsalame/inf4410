@@ -69,7 +69,7 @@ public class Client {
 
 		int total = execute(operations);
 
-		System.out.println(total);
+		System.out.println("Total " + total);
 	}
 
 	private int execute(Operation[] operations) {
@@ -103,7 +103,7 @@ public class Client {
 				e.printStackTrace();
 			}
 			if (result == null) {
-				System.out.println("retry");
+				System.out.println("Server rejected... Retrying with less operations");
 				// Retry second time with less ops
 				high = low + operationsByServer / 3;
 				if (high < 0) {
@@ -118,7 +118,7 @@ public class Client {
 
 			if (result != null) {
 				actualNumberOfOperationsExecuted += high - low + 1;
-				System.out.println(result);
+				System.out.println("Result for operations [" + low + ", " + high +"] = " + result);
 				total += result;
 			}
 		}
