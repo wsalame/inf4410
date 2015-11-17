@@ -4,5 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface ServerInterface extends Remote {
-	Integer executeCalculations(Operation[] operations, int low, int high)  throws RemoteException;;
+  Integer executeCalculations(Operation[] operations, int low, int high) throws RemoteException;
+
+  boolean ping() throws RemoteException;
 }
